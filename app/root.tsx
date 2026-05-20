@@ -11,6 +11,7 @@ import {
 import type { Route } from './+types/root'
 import './app.css'
 import { Toaster } from './components/ui/sonner'
+import { ThemeProvider } from './components/theme-provider'
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -29,7 +30,7 @@ const queryClient = new QueryClient()
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -38,7 +39,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+            {children}
+          </ThemeProvider>
         </QueryClientProvider>
 
         <Toaster />

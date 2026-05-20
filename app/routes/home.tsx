@@ -8,5 +8,9 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <p>hello</p>
+  return (
+    <main >
+      <p>hello</p>
+    </main>
+  )
 }

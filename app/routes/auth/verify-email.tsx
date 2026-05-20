@@ -1,12 +1,14 @@
 import { useMutation } from '@tanstack/react-query'
 import { reload, sendEmailVerification } from 'firebase/auth'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import AppLogo from '~/components/app-logo'
 import { Button } from '~/components/ui/button'
 import { Spinner } from '~/components/ui/spinner'
 import { auth } from '~/firebase.client'
 import type { Route } from './+types/verify-email'
+import { Separator } from '~/components/ui/separator'
+import { ModeToggle } from '~/components/mode-toggle'
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: 'Подтверждение почты' }]
@@ -53,11 +55,16 @@ export default function VerifyEmailPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center gap-2 md:justify-start">
-          <a href="/">
+        <div className="flex items-center gap-2">
+          <Link to="/">
             <AppLogo />
-          </a>
+          </Link>
+
+          <Separator orientation="vertical" className="mx-4" />
+
+          <ModeToggle />
         </div>
+
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-sm">
             <h1 className="text-2xl font-bold mb-6">Подтвердите вашу почту</h1>
@@ -92,7 +99,7 @@ export default function VerifyEmailPage() {
         <img
           src="bg-register.png"
           alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.5] dark:grayscale"
         />
       </div>
     </div>
