@@ -6,6 +6,11 @@ import { toast } from 'sonner'
 import AppLogo from '~/components/app-logo'
 import { PasswordResetForm } from '~/components/auth/password-reset-form'
 import { auth } from '~/firebase.client'
+import type { Route } from './+types/password-reset'
+
+export function meta({}: Route.MetaArgs) {
+  return [{ title: 'Сброс пароля' }]
+}
 
 export default function PasswordResetPage() {
   const navigate = useNavigate()

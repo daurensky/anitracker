@@ -6,6 +6,11 @@ import AppLogo from '~/components/app-logo'
 import { Button } from '~/components/ui/button'
 import { Spinner } from '~/components/ui/spinner'
 import { auth } from '~/firebase.client'
+import type { Route } from './+types/verify-email'
+
+export function meta({}: Route.MetaArgs) {
+  return [{ title: 'Подтверждение почты' }]
+}
 
 export default function VerifyEmailPage() {
   const user = auth.currentUser

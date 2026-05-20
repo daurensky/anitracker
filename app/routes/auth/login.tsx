@@ -10,6 +10,14 @@ import { toast } from 'sonner'
 import AppLogo from '~/components/app-logo'
 import { LoginForm } from '~/components/auth/login-form'
 import { auth } from '~/firebase.client'
+import type { Route } from './+types/login'
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: 'Вход' },
+    { name: 'description', content: 'Войти в AniTracker' },
+  ]
+}
 
 export default function LoginPage() {
   const navigate = useNavigate()

@@ -11,6 +11,17 @@ import { toast } from 'sonner'
 import AppLogo from '~/components/app-logo'
 import { RegisterForm } from '~/components/auth/register-form'
 import { auth } from '~/firebase.client'
+import type { Route } from './+types/register'
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: 'Регистрация' },
+    {
+      name: 'description',
+      content: 'Зарегистрируйся в AniTracker прям сейчас',
+    },
+  ]
+}
 
 export default function RegisterPage() {
   const navigate = useNavigate()
