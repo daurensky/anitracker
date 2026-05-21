@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { toast } from 'sonner'
 import { db } from '~/firebase.client'
-import type { AnimeItem } from './types'
+import type { AnimeItem } from '~/types'
 
 type CreateAnimeInput = Omit<AnimeItem, 'id'>
 

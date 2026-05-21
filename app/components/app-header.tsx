@@ -12,8 +12,9 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Separator } from './ui/separator'
-import AnimeAddDialog from './anime-add-dialog'
+import AnimeForm from './anime-form'
 import { useCreateAnime } from '~/hooks/anime/use-create-anime'
+import { useAnimeCreateStore } from '~/store/use-anime-create-store'
 
 type AppHeaderProps = {
   user: {
@@ -24,7 +25,7 @@ type AppHeaderProps = {
 }
 
 export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
-  const { mutateAsync, status } = useCreateAnime()
+  const { open } = useAnimeCreateStore()
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -58,10 +59,10 @@ export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
 
             <Separator orientation="vertical" className="mx-4" />
 
-            <AnimeAddDialog
-              onSubmit={mutateAsync}
-              isLoading={status === 'pending'}
-            />
+            <Button onClick={open}>
+              <IconPlus />
+              Добавить
+            </Button>
 
             <Separator orientation="vertical" className="mx-4" />
 

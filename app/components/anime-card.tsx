@@ -19,15 +19,16 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
+import { cn } from '~/lib/utils'
 
 const DAYS = [
-  'Воскресенье',
   'Понедельник',
   'Вторник',
   'Среда',
   'Четверг',
   'Пятница',
   'Суббота',
+  'Воскресенье',
 ]
 
 export function calcReleasedEpisodes(
@@ -72,7 +73,10 @@ type AnimeCardProps = {
   watchUrl: string
   firstEpDate: string
   releaseDayNum: number
-}
+  onWatchedEpChange: (count: number) => void
+  onEditClick: () => void
+  onDeleteClick: () => void
+} & React.ComponentProps<'div'>
 
 export default function AnimeCard({
   coverUrl,
@@ -82,6 +86,11 @@ export default function AnimeCard({
   watchUrl,
   firstEpDate,
   releaseDayNum,
+  className,
+  onWatchedEpChange,
+  onEditClick,
+  onDeleteClick,
+  ...props
 }: AnimeCardProps) {
   const releasedEpCount = calcReleasedEpisodes(
     firstEpDate,
@@ -90,7 +99,7 @@ export default function AnimeCard({
   )
 
   return (
-    <Card className="w-full pt-0">
+    <Card className={cn('w-full pt-0', className)} {...props}>
       <img
         src={coverUrl}
         alt=""
@@ -129,25 +138,35 @@ export default function AnimeCard({
               )}
             </span>
           </FieldLabel>
-          <Progress
-            value={(watchedEpCount * 100) / epCount}
-            className="w-full"
-          />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => onWatchedEpChange(watchedEpCount - 1)}
+              disabled={watchedEpCount < 1}
+            >
+              <IconMinus />
+            </Button>
+            <div className="relative w-full">
+              <Progress
+                value={(watchedEpCount * 100) / epCount}
+                className="w-full"
+              />
+              <Progress
+                value={(releasedEpCount * 100) / epCount}
+                className="w-full absolute top-0 left-0 opacity-30"
+              />
+            </div>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => onWatchedEpChange(watchedEpCount + 1)}
+              disabled={watchedEpCount >= releasedEpCount}
+            >
+              <IconPlus />
+            </Button>
+          </div>
         </Field>
-        <div className="flex gap-2">
-          <Button variant="secondary" size="icon">
-            <IconMinus />
-          </Button>
-          <Input
-            value={watchedEpCount}
-            type="number"
-            className="text-center"
-            placeholder="Просмотрено эпизодов"
-          />
-          <Button variant="secondary" size="icon">
-            <IconPlus />
-          </Button>
-        </div>
       </CardContent>
       <CardFooter className="gap-2">
         <Button asChild>
@@ -158,10 +177,10 @@ export default function AnimeCard({
         </Button>
 
         <div className="ml-auto flex gap-2">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" onClick={onEditClick}>
             <IconEdit />
           </Button>
-          <Button variant="destructive" size="icon">
+          <Button variant="destructive" size="icon" onClick={onDeleteClick}>
             <IconTrash />
           </Button>
         </div>
