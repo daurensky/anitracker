@@ -1,18 +1,19 @@
 import { IconLogout, IconPlus } from '@tabler/icons-react'
 import AppLogo from './app-logo'
-import { Button } from './ui/button'
+import { ModeToggle } from './mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { Separator } from './ui/separator'
+import { Button } from './ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { ModeToggle } from './mode-toggle'
+import { Separator } from './ui/separator'
+import AnimeAddDialog from './anime-add-dialog'
+import { useCreateAnime } from '~/hooks/anime/use-create-anime'
 
 type AppHeaderProps = {
   user: {
@@ -23,6 +24,8 @@ type AppHeaderProps = {
 }
 
 export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
+  const { mutateAsync, status } = useCreateAnime()
+
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 py-4 px-4 lg:gap-2 lg:px-6">
@@ -55,10 +58,10 @@ export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
 
             <Separator orientation="vertical" className="mx-4" />
 
-            <Button className="hidden sm:flex">
-              <IconPlus />
-              Добавить тайтл
-            </Button>
+            <AnimeAddDialog
+              onSubmit={mutateAsync}
+              isLoading={status === 'pending'}
+            />
 
             <Separator orientation="vertical" className="mx-4" />
 
