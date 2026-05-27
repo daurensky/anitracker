@@ -1,6 +1,6 @@
 import { IconLogout, IconPlus } from '@tabler/icons-react'
-import type { User } from 'firebase/auth'
-import { useCreateAnimeContext } from '~/context/anime-context'
+import { useCreateAnimeModal } from '~/context/anime-context'
+import { useAuthenticated } from '~/context/auth-context'
 import { getInitials } from '~/lib/utils'
 import AppLogo from './app-logo'
 import { ModeToggle } from './mode-toggle'
@@ -15,14 +15,12 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Separator } from './ui/separator'
+import { useStats } from '~/context/stats-context'
 
-type AppHeaderProps = {
-  user: User
-  onLogoutClick: () => void
-}
-
-export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
-  const { openModal } = useCreateAnimeContext()
+export default function AppHeader() {
+  const { user, logout } = useAuthenticated()
+  const stats = useStats()
+  const { openModal } = useCreateAnimeModal()
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -37,24 +35,31 @@ export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
 
         <div className="ml-auto flex items-center gap-2">
           <div className="flex items-center">
-            <ul className="flex gap-2">
-              <li className="text-sm">
-                {0}{' '}
-                <span className="text-muted-foreground text-xs">
-                  всего тайтлов
-                </span>
-              </li>
-              <li className="text-sm">
-                {0}{' '}
-                <span className="text-muted-foreground text-xs">смотрю</span>
-              </li>
-              <li className="text-sm">
-                {0}{' '}
-                <span className="text-muted-foreground text-xs">завершено</span>
-              </li>
-            </ul>
-
-            <Separator orientation="vertical" className="mx-4" />
+            {stats && (
+              <>
+                <ul className="flex gap-2">
+                  <li className="text-sm">
+                    {stats.anime.total}{' '}
+                    <span className="text-muted-foreground text-xs">
+                      всего
+                    </span>
+                  </li>
+                  <li className="text-sm">
+                    {stats.anime.watching}{' '}
+                    <span className="text-muted-foreground text-xs">
+                      смотрю
+                    </span>
+                  </li>
+                  <li className="text-sm">
+                    {stats.anime.completed}{' '}
+                    <span className="text-muted-foreground text-xs">
+                      завершено
+                    </span>
+                  </li>
+                </ul>
+                <Separator orientation="vertical" className="mx-4" />
+              </>
+            )}
 
             <Button onClick={openModal}>
               <IconPlus />
@@ -123,7 +128,7 @@ export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator /> */}
-                <DropdownMenuItem onClick={onLogoutClick}>
+                <DropdownMenuItem onClick={logout}>
                   <IconLogout />
                   Log out
                 </DropdownMenuItem>

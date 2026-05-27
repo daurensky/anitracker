@@ -1,13 +1,10 @@
 import { IconAlertCircle, IconPlus } from '@tabler/icons-react'
-import AnimeForm from '~/components/anime-form'
-import { Button } from '~/components/ui/button'
-import { Field } from '~/components/ui/field'
-import { Input } from '~/components/ui/input'
-import type { Route } from './+types/home'
-
 import { useState } from 'react'
+import { useDebounce } from 'use-debounce'
 import AnimeCard from '~/components/anime-card'
+import AnimeForm from '~/components/anime-form'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
+import { Button } from '~/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -25,16 +22,19 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '~/components/ui/empty'
+import { Field } from '~/components/ui/field'
 import { Headline } from '~/components/ui/headline'
+import { Input } from '~/components/ui/input'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Spinner } from '~/components/ui/spinner'
-import { useCreateAnimeContext } from '~/context/anime-context'
-import { useAnimeList } from '~/hooks/anime/use-anime-list'
+import { useCreateAnimeModal } from '~/context/anime-context'
+import { useAuthenticated } from '~/context/auth-context'
+import { useAnimeList, type AnimeFilter } from '~/hooks/anime/use-anime-list'
 import { useDeleteAnime } from '~/hooks/anime/use-delete-anime'
 import { useUpdateAnime } from '~/hooks/anime/use-update-anime'
 import { useUpdateAnimeWatched } from '~/hooks/anime/use-update-anime-watched'
 import type { AnimeItem } from '~/types'
-import { useAuthenticated } from '~/context/auth-context'
+import type { Route } from './+types/home'
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -43,75 +43,17 @@ export function meta({}: Route.MetaArgs) {
   ]
 }
 
-function PendingHome() {
-  return (
-    <main className="space-y-6">
-      <section>
-        <div className="container mx-auto space-y-4">
-          <Headline>Скоро выходят</Headline>
-          <p className="text-sm text-muted-foreground">
-            Нет активных аниме с расписанием
-          </p>
-        </div>
-      </section>
-
-      <section>
-        <div className="container mx-auto space-y-4">
-          <Headline>Все аниме</Headline>
-
-          <div className="flex justify-between">
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Все
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Смотрю
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Завершены
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Запланированы
-              </Button>
-            </div>
-            <div>
-              <Field orientation="horizontal">
-                <Input type="search" placeholder="Поиск..." />
-              </Field>
-            </div>
-          </div>
-
-          <ul className="grid grid-cols-3 gap-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <li key={i}>
-                <Skeleton className="w-full aspect-25/27" />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-    </main>
-  )
-}
+const FILTERS: {
+  value: AnimeFilter
+  label: string
+}[] = [
+  { value: 'all', label: 'Все' },
+  { value: 'watching', label: 'Смотрю' },
+  { value: 'completed', label: 'Завершены' },
+]
 
 function EmptyAnimeList() {
-  const { openModal } = useCreateAnimeContext()
+  const { openModal } = useCreateAnimeModal()
 
   return (
     <Empty>
@@ -132,7 +74,16 @@ function EmptyAnimeList() {
 
 export default function Home() {
   const { user } = useAuthenticated()
-  const { data: animeList, status } = useAnimeList(user.uid)
+
+  const [filter, setFilter] = useState<AnimeFilter>('all')
+  const [search, setSearch] = useState('')
+  const [debouncedSearch] = useDebounce(search, 500)
+  const { data: animeList, status } = useAnimeList(
+    user.uid,
+    filter,
+    debouncedSearch,
+  )
+
   const { mutate: mutateWatched } = useUpdateAnimeWatched()
   const { mutateAsync: updateAnime, isPending: isUpdating } = useUpdateAnime()
   const { mutateAsync: deleteAnime, isPending: isDeleting } = useDeleteAnime()
@@ -155,10 +106,6 @@ export default function Home() {
   }
   function closeDeleteModal() {
     setIsDeleteOpen(false)
-  }
-
-  if (status === 'pending') {
-    return <PendingHome />
   }
 
   if (status === 'error') {
@@ -211,43 +158,38 @@ export default function Home() {
 
           <div className="flex justify-between">
             <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Все
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Смотрю
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Завершены
-              </Button>
-              <Button
-                variant="outline"
-                size="xs"
-                className="text-muted-foreground"
-              >
-                Запланированы
-              </Button>
+              {FILTERS.map(f => (
+                <Button
+                  key={f.value}
+                  variant={f.value === filter ? 'outline' : 'ghost'}
+                  size="xs"
+                  onClick={() => setFilter(f.value)}
+                  className="data-[variant=ghost]:text-muted-foreground"
+                >
+                  {f.label}
+                </Button>
+              ))}
             </div>
             <div>
               <Field orientation="horizontal">
-                <Input type="search" placeholder="Поиск..." />
+                <Input
+                  type="search"
+                  placeholder="Поиск..."
+                  onChange={e => setSearch(e.target.value)}
+                />
               </Field>
             </div>
           </div>
 
-          {animeList.length > 0 ? (
+          {status === 'pending' ? (
+            <ul className="grid grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <li key={i}>
+                  <Skeleton className="w-full aspect-25/27" />
+                </li>
+              ))}
+            </ul>
+          ) : animeList.length > 0 ? (
             <ul className="grid grid-cols-3 gap-4">
               {animeList.map((anime, i) => (
                 <li key={anime.id}>

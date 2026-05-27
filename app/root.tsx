@@ -8,7 +8,7 @@ import {
   ScrollRestoration,
 } from 'react-router'
 
-import { onAuthStateChanged, type User } from 'firebase/auth'
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
 import { useEffect, useState } from 'react'
 import type { Route } from './+types/root'
 import './app.css'
@@ -69,6 +69,11 @@ export default function App() {
     return unsubscribe
   }, [])
 
+  async function logout() {
+    await signOut(auth)
+    setUser(null)
+  }
+
   if (loading) {
     return (
       <div className="absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2">
@@ -78,7 +83,7 @@ export default function App() {
   }
 
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, logout }}>
       <Outlet />
     </AuthContext.Provider>
   )

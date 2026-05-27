@@ -11,6 +11,6 @@ export const AnimeCreateContext = createContext<AnimeCreateContextValues>({
   openModal: () => {},
   closeModal: () => {},
 })
-export function useCreateAnimeContext() {
+export function useCreateAnimeModal() {
   return useContext(AnimeCreateContext)
 }
