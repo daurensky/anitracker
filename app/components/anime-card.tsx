@@ -125,19 +125,28 @@ export default function AnimeCard({
           </Badge>
         </div>
         <Field className="w-full">
-          <FieldLabel>
-            <span className="text-muted-foreground">
-              Прогресс (Смотрю / Вышло)
-            </span>
-            <span className="ml-auto">
-              {watchedEpCount}/{releasedEpCount} из {epCount}{' '}
-              {watchedEpCount < releasedEpCount && (
-                <span className="text-destructive">
-                  (-{releasedEpCount - watchedEpCount} эп.)
-                </span>
-              )}
-            </span>
-          </FieldLabel>
+          {releasedEpCount < epCount ? (
+            <FieldLabel>
+              <span className="text-muted-foreground">
+                Прогресс (Смотрю / Вышло)
+              </span>
+              <span className="ml-auto">
+                {watchedEpCount}/{releasedEpCount} из {epCount}{' '}
+                {watchedEpCount < releasedEpCount && (
+                  <span className="text-destructive">
+                    (-{releasedEpCount - watchedEpCount} эп.)
+                  </span>
+                )}
+              </span>
+            </FieldLabel>
+          ) : (
+            <FieldLabel>
+              <span className="text-muted-foreground">Прогресс</span>
+              <span className="ml-auto">
+                {watchedEpCount} из {epCount}
+              </span>
+            </FieldLabel>
+          )}
           <div className="flex items-center gap-2">
             <Button
               variant="secondary"
