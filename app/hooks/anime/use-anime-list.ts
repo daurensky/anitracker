@@ -1,18 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
 import { db } from '~/firebase.client'
 import type { AnimeItem } from '~/types'
 
-const fetchAnimeList = async (): Promise<AnimeItem[]> => {
-  const auth = getAuth()
-  const user = auth.currentUser
-
-  if (!user) return []
-
+const fetchAnimeList = async (userId: string): Promise<AnimeItem[]> => {
   const q = query(
     collection(db, 'anime'),
-    where('userId', '==', user.uid),
+    where('userId', '==', userId),
     orderBy('created_at', 'desc'),
   )
 
@@ -28,10 +22,10 @@ const fetchAnimeList = async (): Promise<AnimeItem[]> => {
   }
 }
 
-export function useAnimeList() {
+export function useAnimeList(userId: string) {
   return useQuery({
     queryKey: ['anime'],
-    queryFn: fetchAnimeList,
+    queryFn: () => fetchAnimeList(userId),
     retry: 1,
   })
 }

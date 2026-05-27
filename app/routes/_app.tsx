@@ -19,9 +19,11 @@ import { auth } from '~/firebase.client'
 import { useCreateAnime } from '~/hooks/anime/use-create-anime'
 
 export default function AppLayout() {
-  const { mutateAsync: createAnime, isPending: isCreating } = useCreateAnime()
-  
   const { user } = useAuthenticated()
+  const { mutateAsync: createAnime, isPending: isCreating } = useCreateAnime(
+    user.uid,
+  )
+
   async function handleLogout() {
     await signOut(auth)
   }
@@ -36,7 +38,7 @@ export default function AppLayout() {
 
   return (
     <AnimeCreateContext.Provider value={{ isOpen, openModal, closeModal }}>
-      <div className="min-h-svh">
+      <div className="min-h-svh space-y-6 flex flex-col">
         <AppHeader user={user} onLogoutClick={handleLogout} />
         <Outlet />
 

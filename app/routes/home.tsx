@@ -34,12 +34,80 @@ import { useDeleteAnime } from '~/hooks/anime/use-delete-anime'
 import { useUpdateAnime } from '~/hooks/anime/use-update-anime'
 import { useUpdateAnimeWatched } from '~/hooks/anime/use-update-anime-watched'
 import type { AnimeItem } from '~/types'
+import { useAuthenticated } from '~/context/auth-context'
 
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'AniTracker' },
     { name: 'description', content: 'Welcome to React Router!' },
   ]
+}
+
+function PendingHome() {
+  return (
+    <main className="space-y-6">
+      <section>
+        <div className="container mx-auto space-y-4">
+          <Headline>Скоро выходят</Headline>
+          <p className="text-sm text-muted-foreground">
+            Нет активных аниме с расписанием
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <div className="container mx-auto space-y-4">
+          <Headline>Все аниме</Headline>
+
+          <div className="flex justify-between">
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="xs"
+                className="text-muted-foreground"
+              >
+                Все
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                className="text-muted-foreground"
+              >
+                Смотрю
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                className="text-muted-foreground"
+              >
+                Завершены
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                className="text-muted-foreground"
+              >
+                Запланированы
+              </Button>
+            </div>
+            <div>
+              <Field orientation="horizontal">
+                <Input type="search" placeholder="Поиск..." />
+              </Field>
+            </div>
+          </div>
+
+          <ul className="grid grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <li key={i}>
+                <Skeleton className="w-full aspect-25/27" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </main>
+  )
 }
 
 function EmptyAnimeList() {
@@ -63,7 +131,8 @@ function EmptyAnimeList() {
 }
 
 export default function Home() {
-  const { data: animeList, status } = useAnimeList()
+  const { user } = useAuthenticated()
+  const { data: animeList, status } = useAnimeList(user.uid)
   const { mutate: mutateWatched } = useUpdateAnimeWatched()
   const { mutateAsync: updateAnime, isPending: isUpdating } = useUpdateAnime()
   const { mutateAsync: deleteAnime, isPending: isDeleting } = useDeleteAnime()
@@ -89,12 +158,7 @@ export default function Home() {
   }
 
   if (status === 'pending') {
-    return (
-      <main className="space-y-6">
-        <Skeleton />
-        <Skeleton />
-      </main>
-    )
+    return <PendingHome />
   }
 
   if (status === 'error') {
