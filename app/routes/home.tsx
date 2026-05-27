@@ -84,7 +84,7 @@ export default function Home() {
     debouncedSearch,
   )
 
-  const { mutate: mutateWatched } = useUpdateAnimeWatched()
+  const { mutate: mutateWatched } = useUpdateAnimeWatched(user.uid)
   const { mutateAsync: updateAnime, isPending: isUpdating } = useUpdateAnime()
   const { mutateAsync: deleteAnime, isPending: isDeleting } = useDeleteAnime()
 

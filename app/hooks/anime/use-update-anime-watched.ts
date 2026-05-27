@@ -7,7 +7,7 @@ import type { AnimeItem } from '~/types'
 
 type UpdateWatchedInput = Pick<AnimeItem, 'id' | 'ep_watched_count'>
 
-export function useUpdateAnimeWatched() {
+export function useUpdateAnimeWatched(userId: string) {
   const queryClient = useQueryClient()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -15,11 +15,14 @@ export function useUpdateAnimeWatched() {
     mutationFn: ({ id, ep_watched_count }: UpdateWatchedInput) =>
       updateDoc(doc(db, 'anime', id), { ep_watched_count }),
     onMutate: async ({ id, ep_watched_count }) => {
-      await queryClient.cancelQueries({ queryKey: ['anime'] })
+      await queryClient.cancelQueries({ queryKey: ['anime', userId] })
 
-      const previousAnime = queryClient.getQueryData<AnimeItem[]>(['anime'])
+      const previousAnime = queryClient.getQueryData<AnimeItem[]>([
+        'anime',
+        userId,
+      ])
 
-      queryClient.setQueryData<AnimeItem[]>(['anime'], old =>
+      queryClient.setQueryData<AnimeItem[]>(['anime', userId], old =>
         old?.map(item =>
           item.id === id ? { ...item, ep_watched_count } : item,
         ),
@@ -29,17 +32,17 @@ export function useUpdateAnimeWatched() {
     },
     onError: (_err, _vars, context) => {
       if (context?.previousAnime) {
-        queryClient.setQueryData(['anime'], context.previousAnime)
+        queryClient.setQueryData(['anime', userId], context.previousAnime)
       }
       toast.error('Не удалось обновить прогресс.')
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['anime'] })
+      queryClient.invalidateQueries({ queryKey: ['anime', userId] })
     },
   })
 
   const debouncedMutate = (input: UpdateWatchedInput) => {
-    queryClient.setQueryData<AnimeItem[]>(['anime'], old =>
+    queryClient.setQueryData<AnimeItem[]>(['anime', userId], old =>
       old?.map(item =>
         item.id === input.id
           ? { ...item, ep_watched_count: input.ep_watched_count }
@@ -51,7 +54,7 @@ export function useUpdateAnimeWatched() {
 
     debounceRef.current = setTimeout(() => {
       mutation.mutate(input)
-    }, 2000)
+    }, 1000)
   }
 
   return { ...mutation, mutate: debouncedMutate }
