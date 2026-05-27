@@ -7,7 +7,6 @@ import {
 } from '@tabler/icons-react'
 import { Button } from '~/components/ui/button'
 import { Field, FieldLabel } from '~/components/ui/field'
-import { Input } from '~/components/ui/input'
 
 import { Link } from 'react-router'
 import { Badge } from '~/components/ui/badge'
@@ -19,51 +18,8 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
-import { cn } from '~/lib/utils'
-
-const DAYS = [
-  'Понедельник',
-  'Вторник',
-  'Среда',
-  'Четверг',
-  'Пятница',
-  'Суббота',
-  'Воскресенье',
-]
-
-export function calcReleasedEpisodes(
-  firstEpDate: string,
-  releaseDay: number | null,
-  totalEps: number,
-): number {
-  const first = new Date(firstEpDate)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  first.setHours(0, 0, 0, 0)
-
-  if (first > today) return 0
-
-  if (releaseDay === null) {
-    const weeks = Math.floor(
-      (today.getTime() - first.getTime()) / (7 * 24 * 60 * 60 * 1000),
-    )
-    return Math.min(weeks + 1, totalEps)
-  }
-
-  const toJsDay = (d: number) => (d + 1) % 7
-
-  const targetDay = toJsDay(releaseDay)
-  const firstRelease = new Date(first)
-  const diff = (targetDay - first.getDay() + 7) % 7
-  firstRelease.setDate(firstRelease.getDate() + diff)
-
-  if (firstRelease > today) return 0
-
-  const weeks = Math.floor(
-    (today.getTime() - firstRelease.getTime()) / (7 * 24 * 60 * 60 * 1000),
-  )
-  return Math.min(weeks + 1, totalEps)
-}
+import { WEEKDAYS } from '~/constants'
+import { calcReleasedEpisodes, cn } from '~/lib/utils'
 
 type AnimeCardProps = {
   coverUrl: string
@@ -115,7 +71,7 @@ export default function AnimeCard({
             Смотрю
           </Badge>
           <Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-            {DAYS[releaseDayNum]}
+            {WEEKDAYS[releaseDayNum]}
           </Badge>
           <Badge className="bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-950 dark:text-fuchsia-300">
             Вышло: {releasedEpCount}
@@ -179,7 +135,7 @@ export default function AnimeCard({
       </CardContent>
       <CardFooter className="gap-2">
         <Button asChild>
-          <Link to={watchUrl} target="_blank">
+          <Link to={watchUrl} target="_blank" rel="noopener noreferrer">
             <IconArrowUpRight />
             Смотреть
           </Link>

@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { db } from '~/firebase.client'
+import { calcDaysUntilRelease, calcReleasedEpisodes } from '~/lib/utils'
 import type { AnimeItem } from '~/types'
 
-export type AnimeFilter = 'all' | 'watching' | 'completed'
+export type AnimeFilter = 'all' | 'watching' | 'completed' | 'releasing'
 
 const fetchAnimeList = async (userId: string): Promise<AnimeItem[]> => {
   const q = query(
@@ -30,9 +31,26 @@ const filterAnime = (list: AnimeItem[], filter: AnimeFilter): AnimeItem[] => {
       return list.filter(a => a.ep_watched_count < a.ep_total_count)
     case 'completed':
       return list.filter(a => a.ep_watched_count >= a.ep_total_count)
+    case 'releasing':
+      return list.filter(a => {
+        const releasedEpCount = calcReleasedEpisodes(
+          a.first_ep_date,
+          a.ep_release_day,
+          a.ep_total_count,
+        )
+        return releasedEpCount < a.ep_total_count
+      })
     default:
       return list
   }
+}
+
+const sortByReleaseDay = (list: AnimeItem[]): AnimeItem[] => {
+  return [...list].sort(
+    (a, b) =>
+      calcDaysUntilRelease(a.ep_release_day) -
+      calcDaysUntilRelease(b.ep_release_day),
+  )
 }
 
 export function useAnimeList(
@@ -45,9 +63,13 @@ export function useAnimeList(
     queryFn: () => fetchAnimeList(userId),
     select: data => {
       const filtered = filterAnime(data, filter)
-      if (!search.trim()) return filtered
-      const q = search.toLowerCase().trim()
-      return filtered.filter(a => a.name.toLowerCase().includes(q))
+      const searched = search.trim()
+        ? filtered.filter(a =>
+            a.name.toLowerCase().includes(search.toLowerCase().trim()),
+          )
+        : filtered
+
+      return filter === 'releasing' ? sortByReleaseDay(searched) : searched
     },
     retry: 1,
   })

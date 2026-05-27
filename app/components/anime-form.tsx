@@ -4,8 +4,7 @@ import { Field, FieldError, FieldGroup } from './ui/field'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
-
-const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+import { WEEKDAYS_SHORT } from '~/constants'
 
 const formSchema = z.object({
   name: z
@@ -159,7 +158,7 @@ export default function AnimeForm({
                   onBlur={field.handleBlur}
                   aria-invalid={isInvalid}
                 >
-                  {DAYS.map((day, i) => (
+                  {WEEKDAYS_SHORT.map((day, i) => (
                     <ToggleGroupItem
                       variant="outline"
                       key={day}
