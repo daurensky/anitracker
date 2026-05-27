@@ -15,5 +15,9 @@ export default function AuthenticatedLayout() {
     if (!user.emailVerified) navigate('/verify-email', { replace: true })
   }, [user])
 
+  if (!user) {
+    return null
+  }
+
   return <Outlet />
 }

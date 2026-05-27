@@ -10,5 +10,9 @@ export default function AuthLayout() {
     if (user && user.emailVerified) navigate('/', { replace: true })
   }, [user])
 
+  if (user) {
+    return null
+  }
+
   return <Outlet />
 }
