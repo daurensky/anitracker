@@ -8,10 +8,14 @@ import {
   ScrollRestoration,
 } from 'react-router'
 
+import { onAuthStateChanged, type User } from 'firebase/auth'
+import { useEffect, useState } from 'react'
 import type { Route } from './+types/root'
 import './app.css'
-import { Toaster } from './components/ui/sonner'
 import { ThemeProvider } from './components/theme-provider'
+import { Toaster } from './components/ui/sonner'
+import { AuthContext } from './context/auth-context'
+import { auth } from './firebase.client'
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -54,7 +58,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      setUser(user)
+      setLoading(false)
+    })
+    return unsubscribe
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2">
+        ЗАГРУЗКА...
+      </div>
+    )
+  }
+
+  return (
+    <AuthContext.Provider value={{ user }}>
+      <Outlet />
+    </AuthContext.Provider>
+  )
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

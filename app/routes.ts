@@ -13,7 +13,7 @@ export default [
     route('forgot-password', 'routes/auth/password-reset.tsx'),
   ]),
 
-  layout('./routes/_protected.tsx', [
+  layout('./routes/_authenticated.tsx', [
     layout('./routes/_app.tsx', [index('routes/home.tsx')]),
   ]),
 ] satisfies RouteConfig

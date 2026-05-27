@@ -3,11 +3,20 @@ import AnimeForm from '~/components/anime-form'
 import { Button } from '~/components/ui/button'
 import { Field } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
-import { useCreateAnime } from '~/hooks/anime/use-create-anime'
 import type { Route } from './+types/home'
 
+import { useState } from 'react'
 import AnimeCard from '~/components/anime-card'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog'
 import {
   Empty,
   EmptyContent,
@@ -18,24 +27,13 @@ import {
 } from '~/components/ui/empty'
 import { Headline } from '~/components/ui/headline'
 import { Skeleton } from '~/components/ui/skeleton'
-import { useAnimeList } from '~/hooks/anime/use-anime-list'
-import { useUpdateAnimeWatched } from '~/hooks/anime/use-update-anime-watched'
-import { useAnimeCreateStore } from '~/store/use-anime-create-store'
-import { useUpdateAnime } from '~/hooks/anime/use-update-anime'
-import { useAnimeEditStore } from '~/store/use-anime-edit-store'
 import { Spinner } from '~/components/ui/spinner'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '~/components/ui/dialog'
-import type { AnimeItem } from '~/types'
-import { useAnimeDeleteStore } from '~/store/use-anime-delete-store'
+import { useCreateAnimeContext } from '~/context/anime-context'
+import { useAnimeList } from '~/hooks/anime/use-anime-list'
 import { useDeleteAnime } from '~/hooks/anime/use-delete-anime'
+import { useUpdateAnime } from '~/hooks/anime/use-update-anime'
+import { useUpdateAnimeWatched } from '~/hooks/anime/use-update-anime-watched'
+import type { AnimeItem } from '~/types'
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -45,7 +43,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 function EmptyAnimeList() {
-  const { open } = useAnimeCreateStore()
+  const { openModal } = useCreateAnimeContext()
 
   return (
     <Empty>
@@ -55,7 +53,7 @@ function EmptyAnimeList() {
         <EmptyDescription>Добавьте первое аниме!</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button onClick={open}>
+        <Button onClick={openModal}>
           <IconPlus />
           Добавить
         </Button>
@@ -69,18 +67,26 @@ export default function Home() {
   const { mutate: mutateWatched } = useUpdateAnimeWatched()
   const { mutateAsync: updateAnime, isPending: isUpdating } = useUpdateAnime()
   const { mutateAsync: deleteAnime, isPending: isDeleting } = useDeleteAnime()
-  const {
-    isOpen: isEditingOpen,
-    anime: editingAnime,
-    open: openAnimeEditing,
-    close: closeAnimeEditing,
-  } = useAnimeEditStore()
-  const {
-    isOpen: isDeletingOpen,
-    anime: deletingAnime,
-    open: openAnimeDeleting,
-    close: closeAnimeDeleting,
-  } = useAnimeDeleteStore()
+
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [editingAnime, setEditingAnime] = useState<AnimeItem | null>(null)
+  function openEditModal(anime: AnimeItem) {
+    setIsEditOpen(true)
+    setEditingAnime(anime)
+  }
+  function closeEditModal() {
+    setIsEditOpen(false)
+  }
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [deletingAnime, setDeletingAnime] = useState<AnimeItem | null>(null)
+  function openDeleteModal(anime: AnimeItem) {
+    setIsDeleteOpen(true)
+    setDeletingAnime(anime)
+  }
+  function closeDeleteModal() {
+    setIsDeleteOpen(false)
+  }
 
   if (status === 'pending') {
     return (
@@ -114,13 +120,13 @@ export default function Home() {
 
   function handleEditClick(anime: AnimeItem) {
     return function () {
-      openAnimeEditing(anime)
+      openEditModal(anime)
     }
   }
 
   function handleDeleteClick(anime: AnimeItem) {
     return function () {
-      openAnimeDeleting(anime)
+      openDeleteModal(anime)
     }
   }
 
@@ -205,7 +211,7 @@ export default function Home() {
       </section>
 
       {/* Edit dialog */}
-      <Dialog open={isEditingOpen} onOpenChange={closeAnimeEditing}>
+      <Dialog open={isEditOpen} onOpenChange={closeEditModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Редактировать аниме</DialogTitle>
@@ -216,7 +222,7 @@ export default function Home() {
             onSubmit={async values => {
               if (editingAnime) {
                 await updateAnime({ id: editingAnime.id, ...values })
-                closeAnimeEditing()
+                closeEditModal()
               }
             }}
           />
@@ -235,7 +241,7 @@ export default function Home() {
       </Dialog>
 
       {/* Delete dialog */}
-      <Dialog open={isDeletingOpen} onOpenChange={closeAnimeDeleting}>
+      <Dialog open={isDeleteOpen} onOpenChange={closeDeleteModal}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="mb-4">{deletingAnime?.name}</DialogTitle>
@@ -253,7 +259,7 @@ export default function Home() {
               onClick={async () => {
                 if (deletingAnime) {
                   await deleteAnime(deletingAnime.id)
-                  closeAnimeDeleting()
+                  closeDeleteModal()
                 }
               }}
               variant="destructive"

@@ -1,4 +1,7 @@
 import { IconLogout, IconPlus } from '@tabler/icons-react'
+import type { User } from 'firebase/auth'
+import { useCreateAnimeContext } from '~/context/anime-context'
+import { getInitials } from '~/lib/utils'
 import AppLogo from './app-logo'
 import { ModeToggle } from './mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
@@ -12,20 +15,14 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Separator } from './ui/separator'
-import AnimeForm from './anime-form'
-import { useCreateAnime } from '~/hooks/anime/use-create-anime'
-import { useAnimeCreateStore } from '~/store/use-anime-create-store'
 
 type AppHeaderProps = {
-  user: {
-    name: string
-    email: string
-  }
+  user: User
   onLogoutClick: () => void
 }
 
 export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
-  const { open } = useAnimeCreateStore()
+  const { openModal } = useCreateAnimeContext()
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -59,7 +56,7 @@ export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
 
             <Separator orientation="vertical" className="mx-4" />
 
-            <Button onClick={open}>
+            <Button onClick={openModal}>
               <IconPlus />
               Добавить
             </Button>
@@ -74,7 +71,11 @@ export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
                     // alt="@shadcn"
                     className="grayscale"
                   />
-                  <AvatarFallback>{user.name}</AvatarFallback>
+                  {user.displayName && (
+                    <AvatarFallback>
+                      {getInitials(user.displayName)}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -90,10 +91,16 @@ export default function AppHeader({ user, onLogoutClick }: AppHeaderProps) {
                         // alt="@shadcn"
                         className="grayscale"
                       />
-                      <AvatarFallback>{user.name}</AvatarFallback>
+                      {user.displayName && (
+                        <AvatarFallback>
+                          {getInitials(user.displayName)}
+                        </AvatarFallback>
+                      )}
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{user.name}</span>
+                      <span className="truncate font-medium">
+                        {user.displayName}
+                      </span>
                       <span className="truncate text-xs text-muted-foreground">
                         {user.email}
                       </span>
