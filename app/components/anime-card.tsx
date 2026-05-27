@@ -19,7 +19,8 @@ import {
 } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
 import { WEEKDAYS } from '~/constants'
-import { calcReleasedEpisodes, cn } from '~/lib/utils'
+import { calcReleasedEpisodes } from '~/lib/anime'
+import { cn } from '~/lib/utils'
 
 type AnimeCardProps = {
   coverUrl: string

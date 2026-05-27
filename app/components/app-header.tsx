@@ -1,7 +1,8 @@
 import { IconLogout, IconPlus } from '@tabler/icons-react'
 import { useCreateAnimeModal } from '~/context/anime-context'
 import { useAuthenticated } from '~/context/auth-context'
-import { getInitials } from '~/lib/utils'
+import { useStats } from '~/context/stats-context'
+import { getInitials } from '~/lib/anime'
 import AppLogo from './app-logo'
 import { ModeToggle } from './mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
@@ -15,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Separator } from './ui/separator'
-import { useStats } from '~/context/stats-context'
 
 export default function AppHeader() {
   const { user, logout } = useAuthenticated()
@@ -40,9 +40,7 @@ export default function AppHeader() {
                 <ul className="flex gap-2">
                   <li className="text-sm">
                     {stats.anime.total}{' '}
-                    <span className="text-muted-foreground text-xs">
-                      всего
-                    </span>
+                    <span className="text-muted-foreground text-xs">всего</span>
                   </li>
                   <li className="text-sm">
                     {stats.anime.watching}{' '}

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { db } from '~/firebase.client'
-import { calcDaysUntilRelease, calcReleasedEpisodes } from '~/lib/utils'
+import { calcDaysUntilRelease, calcReleasedEpisodes } from '~/lib/anime'
 import type { AnimeItem } from '~/types'
 
 export type AnimeFilter = 'all' | 'watching' | 'completed' | 'releasing'

@@ -8,7 +8,7 @@ import {
 } from './ui/item'
 import { WEEKDAYS } from '~/constants'
 import { Badge } from './ui/badge'
-import { calcDaysUntilRelease, calcReleasedEpisodes } from '~/lib/utils'
+import { calcDaysUntilRelease, calcReleasedEpisodes } from '~/lib/anime'
 
 type UpcomingAnimeItemProps = {
   coverUrl: string
