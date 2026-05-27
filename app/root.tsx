@@ -16,6 +16,7 @@ import { ThemeProvider } from './components/theme-provider'
 import { Toaster } from './components/ui/sonner'
 import { AuthContext } from './context/auth-context'
 import { auth } from './firebase.client'
+import { Spinner } from './components/ui/spinner'
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -76,8 +77,10 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2">
-        ЗАГРУЗКА...
+      <div className="fixed inset-0 bg-background flex items-center justify-center">
+        <div className="flex gap-2 items-center">
+          <Spinner /> Загрузка
+        </div>
       </div>
     )
   }
