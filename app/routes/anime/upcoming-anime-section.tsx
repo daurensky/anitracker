@@ -32,10 +32,10 @@ export default function UpcomingAnimeSection() {
         ) : status === 'error' ? (
           <Alert variant="destructive" className="max-w-md">
             <IconAlertCircle />
-            <AlertTitle>Payment failed</AlertTitle>
+            <AlertTitle>Что-то пошло не так</AlertTitle>
             <AlertDescription>
-              Your payment could not be processed. Please check your payment
-              method and try again.
+              Не удалось загрузить предстоящие аниме из-за ошибки. Повторите
+              попытку позже
             </AlertDescription>
           </Alert>
         ) : animeList.length > 0 ? (

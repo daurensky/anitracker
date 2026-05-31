@@ -100,21 +100,6 @@ export default function AnimeListSection() {
     setIsDeleteOpen(false)
   }
 
-  if (status === 'error') {
-    return (
-      <main className="space-y-6">
-        <Alert variant="destructive" className="max-w-md">
-          <IconAlertCircle />
-          <AlertTitle>Payment failed</AlertTitle>
-          <AlertDescription>
-            Your payment could not be processed. Please check your payment
-            method and try again.
-          </AlertDescription>
-        </Alert>
-      </main>
-    )
-  }
-
   function handleWatchedEpChange(animeId: string) {
     return function (count: number) {
       mutateWatched({ id: animeId, ep_watched_count: count })
@@ -172,6 +157,14 @@ export default function AnimeListSection() {
                 </li>
               ))}
             </ul>
+          ) : status === 'error' ? (
+            <Alert variant="destructive" className="max-w-md">
+              <IconAlertCircle />
+              <AlertTitle>Что-то пошло не так</AlertTitle>
+              <AlertDescription>
+                Не удалось загрузить аниме из-за ошибки. Повторите попытку позже
+              </AlertDescription>
+            </Alert>
           ) : animeList.length > 0 ? (
             <ul className="grid grid-cols-3 gap-4">
               {animeList.map((anime, i) => (

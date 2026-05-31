@@ -44,7 +44,7 @@ export default function UpcomingAnimeItem({
         <ItemContent>
           <ItemTitle className="line-clamp-1">{animeName}</ItemTitle>
           <ItemDescription>
-            <span className="text-primary text-xs">
+            <span className="text-primary text-xs dark:text-primary-foreground">
               {WEEKDAYS[releaseDayNum]}
             </span>
             <br />
